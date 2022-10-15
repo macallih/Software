@@ -335,7 +335,7 @@ class Field
     Point friendlyGoalpostPos() const;
 
     /**
-     * Gets the position of the back of the goal with the positive y-axis
+     * Gets the position of the back of the friendly goal with the positive y-axis
      * 
      * @return the position of the friendly back of the goal with the positive y-axis
      */
@@ -349,11 +349,25 @@ class Field
     Point friendlyGoalpostNeg() const;
 
     /**
+     * Gets the position of the back of the friendly goal with the negative y-axis
+     * 
+     * @return the position of the friendly back of the goal with the negative y-axis
+     */
+    Point friendlyGoalBackNeg() const; 
+
+    /**
      * Gets the position of the enemy goalpost with the positive y-axis
      *
      * @return the position of the enemy goalpost with the positive y-axis
      */
     Point enemyGoalpostPos() const;
+
+     /**
+     * Gets the position of the back of the enemy goal with the positive y-axis
+     * 
+     * @return the position of the enemy back of the goal with the positive y-axis
+     */
+    Point enemyGoalBackPos() const; 
 
     /**
      * Gets the position of the enemy goalpost with the negative y-axis
@@ -361,6 +375,13 @@ class Field
      * @return the position of the enemy goalpost with the negative y-axis
      */
     Point enemyGoalpostNeg() const;
+
+    /**
+     * Gets the position of the back of the enemy goal with the negative y-axis
+     * 
+     * @return the position of the enemy back of the goal with the negative y-axis
+     */
+    Point enemyGoalBackNeg() const; 
 
     /**
      * Gets the margin for being out of bounds on the top or bottom of the
