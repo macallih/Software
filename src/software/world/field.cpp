@@ -246,7 +246,7 @@ Point Field::friendlyGoalpostPos() const
 
 Point Field::friendlyGoalBackPos() const
 {
-    return Point(friendlyGoalpostPos().x() - goalXLength(), friendlyGoalpostPos.y());
+    return Point(friendlyGoalpostPos().x() - goalXLength(), friendlyGoalpostPos().y());
 }
 
 Point Field::friendlyGoalpostNeg() const
@@ -256,7 +256,7 @@ Point Field::friendlyGoalpostNeg() const
 
 Point Field::friendlyGoalBackNeg() const
 {
-    return Point(friendlyGoalpostPos().x() - goalXLength(), friendlyGoalpostNeg.y());
+    return Point(friendlyGoalpostPos().x() - goalXLength(), friendlyGoalpostNeg().y());
 }
 
 Point Field::enemyGoalpostPos() const
@@ -266,7 +266,7 @@ Point Field::enemyGoalpostPos() const
 
 Point Field::enemyGoalBackPos() const
 {
-    return Point(enemyGoalpostPos.x() + goalXLength(), enemyGoalpostPos.y());
+    return Point(enemyGoalpostPos().x() + goalXLength(), enemyGoalpostPos().y());
 }
 
 Point Field::enemyGoalpostNeg() const
@@ -276,7 +276,7 @@ Point Field::enemyGoalpostNeg() const
 
 Point Field::enemyGoalBackNeg() const
 {
-    return Point(enemyGoalpostNeg.x() + goalXLength(), enemyGoalpostNeg.y());
+    return Point(enemyGoalpostNeg().x() + goalXLength(), enemyGoalpostNeg().y());
 }
 
 double Field::boundaryMargin() const
