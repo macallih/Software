@@ -244,6 +244,11 @@ Point Field::friendlyGoalpostPos() const
     return Point(friendlyGoalCenter().x(), goalYLength() / 2.0);
 }
 
+Point Field::friendlyGoalBackPos() const
+{
+    return Point(friendlyGoalpostPos().x() - goalXLength(), friendlyGoalpostPos.y())
+}
+
 Point Field::friendlyGoalpostNeg() const
 {
     return Point(friendlyGoalCenter().x(), -goalYLength() / 2.0);

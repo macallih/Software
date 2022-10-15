@@ -42,6 +42,8 @@ enum MotionConstraint
     HALF_METER_AROUND_BALL = 7 [(dynamic) = true];
     // Path between ball and placement point in ball placement
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
+    // The friendly goal
+    FRIENDLY_GOAL = 9; 
 }
 
 message MotionControl

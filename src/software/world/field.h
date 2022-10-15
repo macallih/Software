@@ -335,6 +335,13 @@ class Field
     Point friendlyGoalpostPos() const;
 
     /**
+     * Gets the position of the back of the goal with the positive y-axis
+     * 
+     * @return the position of the friendly back of the goal with the positive y-axis
+     */
+    Point friendlyGoalBackPos() const; 
+
+    /**
      * Gets the position of the friendly goalpost with the negative y-axis
      *
      * @return the position of the friendly goalpost with the negative y-axis
