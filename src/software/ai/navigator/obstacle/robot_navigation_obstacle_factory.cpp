@@ -72,6 +72,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             Rectangle friendly_goal = 
                 Rectangle( field.friendlyGoalpostPos(),
                             field.friendlyGoalBackNeg());
+            obstacles.push_back(createFromShape(friendly_goal));
             break;
         }
         case TbotsProto::MotionConstraint::ENEMY_GOAL:
@@ -80,6 +81,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             Rectangle enemy_goal = 
                 Rectangle( field.enemyGoalpostPos(),
                             field.enemyGoalBackNeg());
+            obstacles.push_back(createFromShape(enemy_goal));
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a
