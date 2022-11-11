@@ -1,4 +1,5 @@
 #include "software/geom/polygon.h"
+#include "shared/constants.h"
 
 #include <unordered_set>
 
@@ -120,6 +121,46 @@ Polygon Polygon::fromSegment(const Segment& segment, const double radius)
         end_r,
         end_l,
     });
+}
+
+Polygon Polygon::fromMultiplePoints(const std::vector<Point>& points)
+{
+    std::vector<Point> polygon_points; 
+
+    Vector first_vector = points[1] - points[0];
+    Point first_point = points[0] + first_vector.rotate(Angle::fromDegrees(90)).normalize(ROBOT_MAX_RADIUS_METERS); 
+    Point second_point = points[0] + first_vector.rotate(Angle::fromDegrees(-90)).normalize(ROBOT_MAX_RADIUS_METERS); 
+
+    polygon_points.emplace_back(first_point);
+    polygon_points.emplace_back(second_point);
+
+    for(int i = 1; i < ((int)(points.size() - 1)); i++)
+    {
+        Vector initial_vector = points[i] - points[i-1]; 
+        Vector final_vector = points[i+1] - points[i];
+        
+        Angle ccw = Angle::fromRadians( acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) );
+        double ccw_distance = (2*ROBOT_MAX_RADIUS_METERS) / sin(ccw.toRadians() / 2.0); 
+        Vector to_first_point = initial_vector.rotate(ccw).normalize(ccw_distance);
+        Point ccw_point = points[i] + to_first_point; 
+
+        Angle cw = ccw + Angle::fromDegrees(180); 
+        double cw_distance = (2*ROBOT_MAX_RADIUS_METERS) / sin(cw.toRadians() / 2.0);
+        Vector to_second_point = initial_vector.rotate(cw).normalize(cw_distance);
+        Point cw_point = points[i] + to_second_point; 
+
+        polygon_points.emplace_back(ccw_point);
+        polygon_points.emplace_back(cw_point); 
+    }
+
+    Vector last_vector = points[points.size()] - points[points.size() - 1];
+    Point before_last_point = points[points.size()] + last_vector.rotate(Angle::fromDegrees(90)).normalize(ROBOT_MAX_RADIUS_METERS);
+    Point last_point = points[points.size()] + last_vector.rotate(Angle::fromDegrees(-90)).normalize(ROBOT_MAX_RADIUS_METERS);
+
+    polygon_points.emplace_back(before_last_point);
+    polygon_points.emplace_back(last_point);
+
+    return Polygon(polygon_points); 
 }
 
 const std::vector<Segment>& Polygon::getSegments() const

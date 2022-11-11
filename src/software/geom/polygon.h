@@ -39,7 +39,7 @@ class Polygon : public virtual Shape
      * @param expansion_amount a non-negative expansion amount
      * @throw std::invalid_argument if expansion_amount is negative
      *
-     * @return a Polygon expanded in all directions by the expansion amount
+     * @return a polygon expanded in all directions by the expansion amount
      */
     Polygon expand(double expansion_amount) const;
 
@@ -66,6 +66,15 @@ class Polygon : public virtual Shape
      * @return an oriented polygon along the 2 points that contains both points.
      */
     static Polygon fromSegment(const Segment& segment, double radius);
+
+    /**
+     * Creates a polygon from a series of conescutive points. The series of points define 
+     * a series of connected line segments at which the polygon is centered. The width
+     * of the polygon is equal to the robot diameter. 
+     * @param points consecutive points that form the line segments around which the polygon will be centered
+     * @return a polygon centered around the series of points with a width of our robot diameter
+     */
+    static Polygon fromMultiplePoints(const std::vector<Point>& points);
 
    protected:
     /**

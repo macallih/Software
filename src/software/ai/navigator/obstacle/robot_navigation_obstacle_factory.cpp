@@ -69,19 +69,31 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
         {
             // IMPORTANT: below rectangle is a PLACEHOLDER for the eventual req'd C polygon
-            Rectangle friendly_goal = 
-                Rectangle( field.friendlyGoalpostPos(),
-                            field.friendlyGoalBackNeg());
-            obstacles.push_back(createFromShape(friendly_goal));
+            //Rectangle friendly_goal = 
+            //    Rectangle( field.friendlyGoalpostPos(),
+            //                field.friendlyGoalBackNeg());
+            //obstacles.push_back(createFromShape(friendly_goal));
             break;
         }
         case TbotsProto::MotionConstraint::ENEMY_GOAL:
         {
-            //IMPORTANT: below rectangle is a PLACEHOLDER for the eventual req'd polygon
-            Rectangle enemy_goal = 
-                Rectangle( field.enemyGoalpostPos(),
-                            field.enemyGoalBackNeg());
-            obstacles.push_back(createFromShape(enemy_goal));
+            //IMPORTANT: below rectangle is a PLACEHOLDER for the eventual req'd C polygon
+            //Rectangle enemy_goal = 
+            //    Rectangle( field.enemyGoalpostPos(),
+            //                field.enemyGoalBackNeg());
+            //obstacles.push_back(createFromShape(enemy_goal));
+
+            std::vector<Point> friendly_goal; 
+            
+            friendly_goal.emplace_back(field.friendlyGoalpostPos());
+            friendly_goal.emplace_back(field.friendlyGoalBackPos());
+            //friendly_goal.emplace_back(field.friendlyGoalBackNeg());
+            //friendly_goal.emplace_back(field.friendlyGoalpostNeg());
+
+            Polygon test_case = Polygon::fromMultiplePoints(friendly_goal);
+            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(test_case));
+
+            break;
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a

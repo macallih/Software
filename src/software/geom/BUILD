@@ -55,6 +55,7 @@ cc_library(
     deps = [
         ":segment",
         ":shape",
+        "//shared:constants",
     ],
 )
 
