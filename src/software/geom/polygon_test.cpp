@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <unordered_set>
-
 #include "software/geom/point.h"
 #include "software/test_util/test_util.h"
 
@@ -142,4 +141,65 @@ TEST(PolygonExpandTest, test_from_segments)
     EXPECT_EQ(second_side.orientation() - third_side.orientation(), ninety_degrees);
     EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), ninety_degrees);
     EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), ninety_degrees);
+}
+
+TEST(PolygonfromPointsTest, general_test)
+{
+    Field field = Field::createSSLDivisionBField();
+
+    std::vector<Point> points; 
+    //std::vector<Point> polygon_points; 
+            
+    points.emplace_back(field.friendlyGoalpostPos());
+    points.emplace_back(field.friendlyGoalBackPos());
+    points.emplace_back(field.friendlyGoalBackNeg());
+    points.emplace_back(field.friendlyGoalpostNeg());
+
+    Vector first_vector = points[1] - points[0];
+    Point first_point = points[0] + first_vector.rotate(Angle::fromDegrees(-135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS); 
+    Point second_point = points[0] + first_vector.rotate(Angle::fromDegrees(135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS); 
+    //polygon_points.emplace_back(first_point);
+    std::cout << std::endl << "first point: " << first_point << std::endl;
+    //polygon_points.emplace_back(second_point);
+    std::cout << "second point: " << second_point << std::endl; 
+
+    for(int i = 1; i < ((int)(points.size() - 1)); i++)
+    {
+        Vector initial_vector = points[i] - points[i-1]; 
+        Vector final_vector = points[i+1] - points[i];
+        
+        Angle ccw = Angle::fromRadians( - acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
+        double distance = ROBOT_MAX_RADIUS_METERS / sin(ccw.toRadians()); 
+        Vector to_first_point = initial_vector.rotate(ccw).normalize(distance);
+        Point ccw_point = points[i] + to_first_point; 
+
+        //polygon_points.emplace_back(ccw_point);
+        std::cout << "next point (angle  = " << ccw << ", distance = " << distance << "): " << ccw_point << std::endl;  
+    }
+
+    Vector last_vector = points[points.size()-1] - points[points.size() - 2];
+    Point before_last_point = points[points.size()-1] + last_vector.rotate(Angle::fromDegrees(-135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS);
+    Point last_point = points[points.size()-1] + last_vector.rotate(Angle::fromDegrees(135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS);
+    //polygon_points.emplace_back(before_last_point);
+    std::cout << "before last point: " << before_last_point << std::endl; 
+    //polygon_points.emplace_back(last_point);
+    std::cout << "last point: " << last_point << std::endl; 
+
+    for(int i = ((int)(points.size() - 2)); i > 0 ; i--)
+    {
+        Vector initial_vector = points[i] - points[i-1]; 
+        Vector final_vector = points[i+1] - points[i];
+        
+        Angle ccw = Angle::fromRadians( - acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
+        Angle cw = ccw + Angle::fromDegrees(180);
+        double distance = ROBOT_MAX_RADIUS_METERS / sin(ccw.toRadians()); 
+        Vector to_first_point = initial_vector.rotate(cw).normalize(distance);
+        Point cw_point = points[i] + to_first_point; 
+
+        //polygon_points.emplace_back(cw_point);
+        std::cout << "next point (angle  = " << cw << ", distance = " << distance << "): " << cw_point << std::endl;   
+
+    }
+
+    std::cout << std::endl << std::endl << "size implementation test" << std::endl << "size: " << points.size() - 1 << ", that point = " << points[points.size() - 1];
 }
