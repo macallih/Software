@@ -128,8 +128,13 @@ Polygon Polygon::fromMultiplePoints(const std::vector<Point>& points)
     std::vector<Point> polygon_points; 
 
     Vector first_vector = points[1] - points[0];
-    Point first_point = points[0] + first_vector.rotate(Angle::fromDegrees(-135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS); 
-    Point second_point = points[0] + first_vector.rotate(Angle::fromDegrees(135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS); 
+    Vector second_vector = points[2] - points[1];
+
+    Angle first_angle = Angle::fromRadians( acos(first_vector.dot(second_vector)/(first_vector.length()*second_vector.length()))) - Angle::fromDegrees(90);
+    Vector to_first_points = second_vector - first_vector.normalize(second_vector.length()*std::sin(first_angle.toRadians()));
+    Point first_point = points[0] - to_first_points.normalize(ROBOT_MAX_RADIUS_METERS) - first_vector.normalize(ROBOT_MAX_RADIUS_METERS); 
+    Point second_point = points[0] + to_first_points.normalize(ROBOT_MAX_RADIUS_METERS) - first_vector.normalize(ROBOT_MAX_RADIUS_METERS); 
+   
     polygon_points.emplace_back(first_point);
     polygon_points.emplace_back(second_point);
 
@@ -138,17 +143,22 @@ Polygon Polygon::fromMultiplePoints(const std::vector<Point>& points)
         Vector initial_vector = points[i] - points[i-1]; 
         Vector final_vector = points[i+1] - points[i];
         
-        Angle inner = Angle::fromRadians( - acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
+        Angle inner = Angle::fromRadians( acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
         double distance = ROBOT_MAX_RADIUS_METERS / sin(inner.toRadians()); 
-        Vector to_point = initial_vector.rotate(inner).normalize(distance);
-        Point inner_point = points[i] + to_point; 
+        Vector to_point = final_vector.normalize(initial_vector.length()) - initial_vector; 
+        Point inner_point = points[i] + to_point.normalize(distance); 
 
         polygon_points.emplace_back(inner_point);
     }
 
     Vector last_vector = points[points.size()-1] - points[points.size() - 2];
-    Point before_last_point = points[points.size()-1] + last_vector.rotate(Angle::fromDegrees(45)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS);
-    Point last_point = points[points.size()-1] + last_vector.rotate(Angle::fromDegrees(-45)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS);
+    Vector before_last_vector = points[points.size() - 2] - points[points.size() - 3];
+
+    Angle last_angle = Angle::fromRadians( acos(before_last_vector.dot(last_vector)/(before_last_vector.length()*last_vector.length()))) - Angle::fromDegrees(90);
+    Vector to_last_points = before_last_vector - last_vector.normalize(before_last_vector.length()*std::sin(last_angle.toRadians()));
+    Point before_last_point = points[points.size()-1] - to_last_points.normalize(ROBOT_MAX_RADIUS_METERS) - first_vector.normalize(ROBOT_MAX_RADIUS_METERS); 
+    Point last_point = points[points.size()-1] + to_last_points.normalize(ROBOT_MAX_RADIUS_METERS) - first_vector.normalize(ROBOT_MAX_RADIUS_METERS); ;
+    
     polygon_points.emplace_back(before_last_point);
     polygon_points.emplace_back(last_point);
 
@@ -157,11 +167,10 @@ Polygon Polygon::fromMultiplePoints(const std::vector<Point>& points)
         Vector initial_vector = points[i] - points[i-1]; 
         Vector final_vector = points[i+1] - points[i];
         
-        Angle inner = Angle::fromRadians( - acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
-        Angle outer = inner + Angle::fromDegrees(180);
+        Angle inner = Angle::fromRadians( acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
         double distance = ROBOT_MAX_RADIUS_METERS / sin(inner.toRadians()); 
-        Vector to_point = initial_vector.rotate(outer).normalize(distance);
-        Point outer_point = points[i] + to_point; 
+        Vector to_point = final_vector.normalize(initial_vector.length()) - initial_vector; 
+        Point outer_point = points[i] + to_point.normalize(distance).rotate(Angle::fromDegrees(180)); 
 
         polygon_points.emplace_back(outer_point);
     }
