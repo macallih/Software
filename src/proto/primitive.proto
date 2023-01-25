@@ -45,8 +45,6 @@ enum MotionConstraint
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
     // The friendly goal
     FRIENDLY_GOAL = 9; 
-    // The enemy goal
-    ENEMY_GOAL = 10; 
 }
 
 message MotionControl

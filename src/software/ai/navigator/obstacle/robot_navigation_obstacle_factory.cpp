@@ -80,21 +80,6 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
 
             break;
         }
-        case TbotsProto::MotionConstraint::ENEMY_GOAL:
-        {
-
-            std::vector<Point> enemy_goal_points; 
-            
-            enemy_goal_points.emplace_back(field.enemyGoalpostPos());
-            enemy_goal_points.emplace_back(field.enemyGoalBackPos());
-            enemy_goal_points.emplace_back(field.enemyGoalBackNeg());
-            enemy_goal_points.emplace_back(field.enemyGoalpostNeg());
-
-            Polygon enemy_goal = Polygon::fromMultiplePoints(enemy_goal_points);
-            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(enemy_goal));
-
-            break;
-        }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a
             // dynamic obstacle
