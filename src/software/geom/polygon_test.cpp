@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <unordered_set>
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/point.h"
 #include "software/test_util/test_util.h"
 
@@ -145,61 +146,66 @@ TEST(PolygonExpandTest, test_from_segments)
 
 TEST(PolygonfromPointsTest, general_test)
 {
-    Field field = Field::createSSLDivisionBField();
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{0.0f, 1.0f}, p4{1.0f, 1.0f},
+          p5{3.0f,0.0f}, p6{2.0f,1.0f};
 
-    std::vector<Point> points; 
-    //std::vector<Point> polygon_points; 
-            
-    points.emplace_back(field.friendlyGoalpostPos());
-    points.emplace_back(field.friendlyGoalBackPos());
-    points.emplace_back(field.friendlyGoalBackNeg());
-    points.emplace_back(field.friendlyGoalpostNeg());
+    // In the order below, these four points will create a downward facing U shape. 
+    std::vector<Point> test_down_u_pts; 
+    test_down_u_pts.emplace_back(p1); 
+    test_down_u_pts.emplace_back(p3);
+    test_down_u_pts.emplace_back(p4);
+    test_down_u_pts.emplace_back(p2); 
+    Polygon test_down_u = Polygon::fromMultiplePoints(test_down_u_pts);
 
-    Vector first_vector = points[1] - points[0];
-    Point first_point = points[0] + first_vector.rotate(Angle::fromDegrees(-135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS); 
-    Point second_point = points[0] + first_vector.rotate(Angle::fromDegrees(135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS); 
-    //polygon_points.emplace_back(first_point);
-    std::cout << std::endl << "first point: " << first_point << std::endl;
-    //polygon_points.emplace_back(second_point);
-    std::cout << "second point: " << second_point << std::endl; 
+    // These are the points expected to be just contained by the polygon at every joint or end
+    Point t1{-ROBOT_MAX_RADIUS_METERS+0.01, -ROBOT_MAX_RADIUS_METERS+0.01},
+          t2{ROBOT_MAX_RADIUS_METERS-0.01,-ROBOT_MAX_RADIUS_METERS+0.01},
+          t3{-ROBOT_MAX_RADIUS_METERS+0.01,0.99+ROBOT_MAX_RADIUS_METERS},
+          t4{ROBOT_MAX_RADIUS_METERS-0.01,1.01-ROBOT_MAX_RADIUS_METERS},
+          t5{1.01-ROBOT_MAX_RADIUS_METERS,1.01-ROBOT_MAX_RADIUS_METERS},
+          t6{0.99+ROBOT_MAX_RADIUS_METERS,0.99+ROBOT_MAX_RADIUS_METERS},
+          t7{1.01-ROBOT_MAX_RADIUS_METERS,-ROBOT_MAX_RADIUS_METERS+0.01},
+          t8{0.99+ROBOT_MAX_RADIUS_METERS,-ROBOT_MAX_RADIUS_METERS+0.01};
 
-    for(int i = 1; i < ((int)(points.size() - 1)); i++)
-    {
-        Vector initial_vector = points[i] - points[i-1]; 
-        Vector final_vector = points[i+1] - points[i];
-        
-        Angle ccw = Angle::fromRadians( - acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
-        double distance = ROBOT_MAX_RADIUS_METERS / sin(ccw.toRadians()); 
-        Vector to_first_point = initial_vector.rotate(ccw).normalize(distance);
-        Point ccw_point = points[i] + to_first_point; 
+    // These are the points expected to be just not contained by the polygon at every joint or end
+    Point f1{-ROBOT_MAX_RADIUS_METERS-0.01, -ROBOT_MAX_RADIUS_METERS-0.01},
+          f2{ROBOT_MAX_RADIUS_METERS+0.01,-ROBOT_MAX_RADIUS_METERS-0.01},
+          f3{-ROBOT_MAX_RADIUS_METERS-0.01,1.01+ROBOT_MAX_RADIUS_METERS},
+          f4{ROBOT_MAX_RADIUS_METERS+0.01,0.99-ROBOT_MAX_RADIUS_METERS},
+          f5{0.99-ROBOT_MAX_RADIUS_METERS,0.99-ROBOT_MAX_RADIUS_METERS},
+          f6{1.01+ROBOT_MAX_RADIUS_METERS,1.01+ROBOT_MAX_RADIUS_METERS},
+          f7{0.99-ROBOT_MAX_RADIUS_METERS,-ROBOT_MAX_RADIUS_METERS-0.01},
+          f8{1.01+ROBOT_MAX_RADIUS_METERS,-ROBOT_MAX_RADIUS_METERS-0.01};
 
-        //polygon_points.emplace_back(ccw_point);
-        std::cout << "next point (angle  = " << ccw << ", distance = " << distance << "): " << ccw_point << std::endl;  
-    }
+    EXPECT_TRUE(contains(test_down_u, t1));
+    EXPECT_TRUE(contains(test_down_u,t2));
+    EXPECT_TRUE(contains(test_down_u,t3));
+    EXPECT_TRUE(contains(test_down_u,t4));
+    EXPECT_TRUE(contains(test_down_u,t5));
+    EXPECT_TRUE(contains(test_down_u,t6));
+    EXPECT_TRUE(contains(test_down_u,t7));
+    EXPECT_TRUE(contains(test_down_u,t8));
 
-    Vector last_vector = points[points.size()-1] - points[points.size() - 2];
-    Point before_last_point = points[points.size()-1] + last_vector.rotate(Angle::fromDegrees(-135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS);
-    Point last_point = points[points.size()-1] + last_vector.rotate(Angle::fromDegrees(135)).normalize(std::sqrt(2)*ROBOT_MAX_RADIUS_METERS);
-    //polygon_points.emplace_back(before_last_point);
-    std::cout << "before last point: " << before_last_point << std::endl; 
-    //polygon_points.emplace_back(last_point);
-    std::cout << "last point: " << last_point << std::endl; 
+    EXPECT_FALSE(contains(test_down_u,f1));
+    EXPECT_FALSE(contains(test_down_u,f2));
+    EXPECT_FALSE(contains(test_down_u,f3));
+    EXPECT_FALSE(contains(test_down_u,f4));
+    EXPECT_FALSE(contains(test_down_u,f5));
+    EXPECT_FALSE(contains(test_down_u,f6));
+    EXPECT_FALSE(contains(test_down_u,f7));
+    EXPECT_FALSE(contains(test_down_u,f8));
 
-    for(int i = ((int)(points.size() - 2)); i > 0 ; i--)
-    {
-        Vector initial_vector = points[i] - points[i-1]; 
-        Vector final_vector = points[i+1] - points[i];
-        
-        Angle ccw = Angle::fromRadians( - acos(initial_vector.dot(final_vector)/(initial_vector.length()*final_vector.length())) / 2.0 );
-        Angle cw = ccw + Angle::fromDegrees(180);
-        double distance = ROBOT_MAX_RADIUS_METERS / sin(ccw.toRadians()); 
-        Vector to_first_point = initial_vector.rotate(cw).normalize(distance);
-        Point cw_point = points[i] + to_first_point; 
+    // In the order below, these four points will create a slanted u shape: \_\ ;
+    std::vector<Point> test_slant_u_pts; 
+    test_slant_u_pts.emplace_back(p3); 
+    test_slant_u_pts.emplace_back(p2);
+    test_slant_u_pts.emplace_back(p5);
+    test_slant_u_pts.emplace_back(p6); 
+    Polygon test_slant_u = Polygon::fromMultiplePoints(test_slant_u_pts);
 
-        //polygon_points.emplace_back(cw_point);
-        std::cout << "next point (angle  = " << cw << ", distance = " << distance << "): " << cw_point << std::endl;   
+    // These are the points expected to be just contained by the polygon at every joint of end
+    Point g1{-sqrt(2)*ROBOT_MAX_RADIUS_METERS+0.01,1};
 
-    }
+    EXPECT_TRUE(contains(test_slant_u,g1));
 
-    std::cout << std::endl << std::endl << "size implementation test" << std::endl << "size: " << points.size() - 1 << ", that point = " << points[points.size() - 1];
 }

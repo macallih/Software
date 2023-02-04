@@ -73,7 +73,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             friendly_goal_points.emplace_back(field.friendlyGoalpostPos());
             friendly_goal_points.emplace_back(field.friendlyGoalBackPos());
             friendly_goal_points.emplace_back(field.friendlyGoalBackNeg());
-            friendly_goal_points.emplace_back(field.friendlyGoalpostNeg());
+            friendly_goal_points.emplace_back(field.friendlyGoalCenter());
 
             Polygon friendly_goal = Polygon::fromMultiplePoints(friendly_goal_points);
             obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(friendly_goal));
@@ -128,9 +128,6 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
             // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::ENEMY_GOAL:
-            //not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
